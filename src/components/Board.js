@@ -13,14 +13,24 @@ const Board = () => {
   );
 
   const cellClickHandler = (row, col) => {
+    // Check if cell is ticked
     if (cells[row][col]) return;
 
+    // Clone new cells and update
     const newCells = cells.slice();
-
     newCells[row][col] = playerTurn;
+
+    // Check winner
     const winner = victoryCheck(newCells);
     if (winner) dispatch({ type: "GAME_OVER", payload: { winner } });
 
+    // Check draw
+    if (drawCheck(newCells))
+      dispatch({ type: "GAME_OVER", payload: { winner: null } });
+
+    // Add history
+
+    // Set player turn
     setPlayerTurn(
       playerTurn === PLAYER.PLAYER_1 ? PLAYER.PLAYER_2 : PLAYER.PLAYER_1
     );
@@ -49,7 +59,7 @@ const Board = () => {
       if (win) return cells[0][col];
     }
 
-    // Check diagonals
+    // Check diagonal
     let result = cells[0][0];
     for (let i = 1; i < state.boardSize; i++) {
       if (cells[0][0] !== cells[i][i]) {
@@ -59,6 +69,7 @@ const Board = () => {
     }
     if (result) return result;
 
+    // Check reverse diagonal
     result = cells[0][state.boardSize - 1];
     for (let i = 1; i < state.boardSize; i++) {
       if (cells[0][state.boardSize - 1] !== cells[i][state.boardSize - 1 - i])
@@ -66,6 +77,17 @@ const Board = () => {
     }
 
     return result;
+  };
+
+  const drawCheck = (cells) => {
+    let isDraw = true;
+    cells.forEach((cell) => {
+      cell.forEach((c) => {
+        if (c === null) isDraw = false;
+      });
+    });
+
+    return isDraw;
   };
 
   return (

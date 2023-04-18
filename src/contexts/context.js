@@ -5,6 +5,7 @@ const initState = {
   gameScreen: GAME_SCREEN.STARTGAME,
   boardSize: 3,
   winner: null,
+  historyBoard: [],
 };
 
 const AppContext = createContext();
@@ -21,6 +22,7 @@ const appReducer = (state, action) => {
         ...state,
         boardSize: +action.payload.boardSize,
       };
+
     case "GAME_OVER":
       return {
         ...state,
