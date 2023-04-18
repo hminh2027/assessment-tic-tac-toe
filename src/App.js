@@ -1,10 +1,13 @@
-import GameScreen from "./GameScreen";
+import { AppProvider } from "./contexts/context";
+import GameScreenManager from "./GameScreenManager";
 
 function App() {
   return (
-    <div className="App">
-      <GameScreen />
-    </div>
+    <AppProvider>
+      <div className="flex h-screen items-center">
+        <GameScreenManager />
+      </div>
+    </AppProvider>
   );
 }
 
