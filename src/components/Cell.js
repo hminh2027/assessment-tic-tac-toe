@@ -12,10 +12,12 @@ const Cell = ({ value, cellClickHandler, col, row }) => {
   }, [value]);
 
   return (
-    <div className="flex h-32 w-32  items-center border-2 border-black">
+    <div
+      onClick={() => cellClickHandler(row, col)}
+      className="flex h-32 w-32  items-center border-2 border-black"
+    >
       <div
         className="mx-auto h-24 w-24"
-        onClick={() => cellClickHandler(row, col)}
         style={{
           background: `url(${displayIcon}) no-repeat center center/cover`,
         }}

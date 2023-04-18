@@ -18,31 +18,54 @@ const Board = () => {
     const newCells = cells.slice();
 
     newCells[row][col] = playerTurn;
-    const rs = victoryCheck(newCells);
-    console.log(rs);
+    const winner = victoryCheck(newCells);
+    if (winner) dispatch({ type: "GAME_OVER", payload: { winner } });
+
     setPlayerTurn(
       playerTurn === PLAYER.PLAYER_1 ? PLAYER.PLAYER_2 : PLAYER.PLAYER_1
     );
   };
 
   const victoryCheck = (cells) => {
-    for (let i = 0; i < 3; i++) {
-      if (cells[i][0] === cells[i][1] && cells[i][0] === cells[i][2])
-        return cells[i][0];
+    // Check rows
+    for (let row = 0; row < state.boardSize; row++) {
+      let win = true;
+      for (let col = 1; col < state.boardSize; col++) {
+        if (cells[row][0] !== cells[row][col] || !cells[row][col]) {
+          win = false;
+        }
+      }
+      if (win) return cells[row][0];
     }
 
-    for (let i = 0; i < 3; i++) {
-      if (cells[0][i] === cells[1][i] && cells[0][i] === cells[2][i])
-        return cells[0][i];
+    // Check columns
+    for (let col = 0; col < state.boardSize; col++) {
+      let win = true;
+      for (let row = 1; row < state.boardSize; row++) {
+        if (cells[0][col] !== cells[row][col] || !cells[row][col]) {
+          win = false;
+        }
+      }
+      if (win) return cells[0][col];
     }
 
-    if (board[0][0] === board[1][1] && board[1][1] === board[2][2])
-      return board[0][0];
+    // Check diagonals
+    let result = cells[0][0];
+    for (let i = 1; i < state.boardSize; i++) {
+      if (cells[0][0] !== cells[i][i]) {
+        result = null;
+        break;
+      }
+    }
+    if (result) return result;
 
-    if (board[0][2] === board[1][1] && board[1][1] === board[2][0])
-      return board[0][2];
+    result = cells[0][state.boardSize - 1];
+    for (let i = 1; i < state.boardSize; i++) {
+      if (cells[0][state.boardSize - 1] !== cells[i][state.boardSize - 1 - i])
+        result = null;
+    }
 
-    return null;
+    return result;
   };
 
   return (

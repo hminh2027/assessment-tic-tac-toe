@@ -4,7 +4,7 @@ import { GAME_SCREEN } from "../constants/constants";
 const initState = {
   gameScreen: GAME_SCREEN.STARTGAME,
   boardSize: 3,
-  cellsToWin: 3,
+  winner: null,
 };
 
 const AppContext = createContext();
@@ -16,12 +16,19 @@ const appReducer = (state, action) => {
         ...state,
         gameScreen: action.payload.screen,
       };
-    case "UPDATE_GAME_SETTING":
+    case "UPDATE_BOARD_SIZE":
       return {
         ...state,
-        boardSize: action.payload.boardSize,
-        cellsToWin: action.payload.cellsToWin,
+        boardSize: +action.payload.boardSize,
       };
+    case "GAME_OVER":
+      return {
+        ...state,
+        gameScreen: GAME_SCREEN.ENDGAME,
+        winner: action.payload.winner,
+      };
+    case "REPLAY":
+      return initState;
     default: {
       throw new Error(`Unhandled action type: ${action.type}`);
     }

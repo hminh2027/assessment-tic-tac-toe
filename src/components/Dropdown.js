@@ -1,20 +1,16 @@
 import React, { useContext } from "react";
 import { AppContext } from "../contexts/context";
 
-const optionList = [
-  { name: "3x3", size: 3, rule: 3 },
-  { name: "5x5", size: 5, rule: 4 },
-];
+const optionList = [3, 5, 7];
 
 const Dropdown = () => {
   const { dispatch } = useContext(AppContext);
 
   const onChangeHandler = (e) =>
     dispatch({
-      type: "UPDATE_GAME_SETTING",
+      type: "UPDATE_BOARD_SIZE",
       payload: {
-        boardSize: optionList[e.target.value].size,
-        cellsToWin: optionList[e.target.value].rule,
+        boardSize: e.target.value,
       },
     });
 
@@ -24,14 +20,14 @@ const Dropdown = () => {
       name="setting"
       className="m-4 w-32 rounded-lg bg-black py-3 text-center text-lg font-bold text-white shadow-md shadow-slate-500 "
     >
-      {optionList.map((option, index) => (
+      {optionList.map((option) => (
         <option
           defaultChecked
           className="rounded-lg p-3"
-          value={index}
-          key={option.name}
+          value={option}
+          key={option}
         >
-          {option.name}
+          {option}
         </option>
       ))}
     </select>
