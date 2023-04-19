@@ -1,16 +1,16 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { PLAYER } from "../constants/constants";
 import { AppContext } from "../contexts/context";
 import Cell from "./Cell";
 
-const Board = () => {
+const Board = ({ playerTurn, setPlayerTurn }) => {
   const { state, dispatch } = useContext(AppContext);
-  const [playerTurn, setPlayerTurn] = useState(PLAYER.PLAYER_1);
-  const [cells, setCells] = useState(
-    Array(state.boardSize)
-      .fill(null)
-      .map((x) => Array(state.boardSize).fill(null))
-  );
+  const [cells, setCells] = useState([]);
+
+  useEffect(() => {
+    if (state.historyBoard.length === 0) return;
+    setCells(state.historyBoard[state.curIndex]);
+  }, [state.curIndex]);
 
   const cellClickHandler = (row, col) => {
     // Check if cell is ticked
@@ -21,7 +21,7 @@ const Board = () => {
     newCells[row][col] = playerTurn;
 
     // Check winner
-    const winner = victoryCheck(newCells);
+    const winner = victoryCheck(newCells, row, col);
     if (winner) dispatch({ type: "GAME_OVER", payload: { winner } });
 
     // Check draw
@@ -29,6 +29,10 @@ const Board = () => {
       dispatch({ type: "GAME_OVER", payload: { winner: null } });
 
     // Add history
+    dispatch({
+      type: "PUSH_BOARD_HISTORY",
+      payload: { historyBoard: newCells },
+    });
 
     // Set player turn
     setPlayerTurn(
@@ -36,47 +40,35 @@ const Board = () => {
     );
   };
 
-  const victoryCheck = (cells) => {
-    // Check rows
-    for (let row = 0; row < state.boardSize; row++) {
-      let win = true;
-      for (let col = 1; col < state.boardSize; col++) {
-        if (cells[row][0] !== cells[row][col] || !cells[row][col]) {
-          win = false;
-        }
-      }
-      if (win) return cells[row][0];
+  const victoryCheck = (cells, rowIdx, colIdx) => {
+    // Check row
+    for (let col = 0; col < state.boardSize - 1; col++) {
+      if (cells[rowIdx][col] !== cells[rowIdx][col + 1] || !cells[rowIdx][col])
+        break;
+      if (col + 1 === state.boardSize - 1) return cells[rowIdx][col];
     }
 
-    // Check columns
-    for (let col = 0; col < state.boardSize; col++) {
-      let win = true;
-      for (let row = 1; row < state.boardSize; row++) {
-        if (cells[0][col] !== cells[row][col] || !cells[row][col]) {
-          win = false;
-        }
-      }
-      if (win) return cells[0][col];
+    // Check column
+    for (let row = 0; row < state.boardSize - 1; row++) {
+      if (cells[row][colIdx] !== cells[row + 1][colIdx] || !cells[row][colIdx])
+        break;
+      if (row + 1 === state.boardSize - 1) return cells[row][colIdx];
     }
 
     // Check diagonal
-    let result = cells[0][0];
     for (let i = 1; i < state.boardSize; i++) {
-      if (cells[0][0] !== cells[i][i]) {
-        result = null;
-        break;
-      }
+      if (cells[0][0] !== cells[i][i]) break;
+      if (i === state.boardSize - 1) return cells[0][0];
     }
-    if (result) return result;
 
     // Check reverse diagonal
-    result = cells[0][state.boardSize - 1];
     for (let i = 1; i < state.boardSize; i++) {
       if (cells[0][state.boardSize - 1] !== cells[i][state.boardSize - 1 - i])
-        result = null;
+        break;
+      if (i === state.boardSize - 1) return cells[0][state.boardSize - 1];
     }
 
-    return result;
+    return null;
   };
 
   const drawCheck = (cells) => {
@@ -92,19 +84,20 @@ const Board = () => {
 
   return (
     <div>
-      {cells.map((row, rowIdx) => (
-        <div key={rowIdx} className="flex justify-center">
-          {row.map((col, colIdx) => (
-            <Cell
-              key={colIdx}
-              value={cells[rowIdx][colIdx]}
-              cellClickHandler={cellClickHandler}
-              col={colIdx}
-              row={rowIdx}
-            />
-          ))}
-        </div>
-      ))}
+      {cells.length > 0 &&
+        cells.map((row, rowIdx) => (
+          <div key={rowIdx} className="flex justify-center">
+            {row.map((col, colIdx) => (
+              <Cell
+                key={colIdx}
+                value={cells[rowIdx][colIdx]}
+                cellClickHandler={cellClickHandler}
+                col={colIdx}
+                row={rowIdx}
+              />
+            ))}
+          </div>
+        ))}
     </div>
   );
 };

@@ -6,6 +6,7 @@ const initState = {
   boardSize: 3,
   winner: null,
   historyBoard: [],
+  curIndex: -1,
 };
 
 const AppContext = createContext();
@@ -22,7 +23,24 @@ const appReducer = (state, action) => {
         ...state,
         boardSize: +action.payload.boardSize,
       };
-
+    case "PUSH_BOARD_HISTORY":
+      const cloned = structuredClone(state.historyBoard);
+      cloned.push(action.payload.historyBoard);
+      return {
+        ...state,
+        historyBoard: cloned,
+        curIndex: state.curIndex + 1,
+      };
+    case "INCREASE_INDEX":
+      return {
+        ...state,
+        curIndex: state.curIndex + 1,
+      };
+    case "DECREASE_INDEX":
+      return {
+        ...state,
+        curIndex: state.curIndex - 1,
+      };
     case "GAME_OVER":
       return {
         ...state,

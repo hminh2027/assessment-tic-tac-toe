@@ -5,6 +5,6 @@ export const GAME_SCREEN = {
 };
 
 export const PLAYER = {
-  PLAYER_1: "x",
-  PLAYER_2: "o",
+  PLAYER_1: "X",
+  PLAYER_2: "O",
 };

@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
 import { AppContext } from "../contexts/context";
 
-const optionList = [3, 5, 7];
+const optionList = [3, 4, 5];
 
 const Dropdown = () => {
   const { dispatch } = useContext(AppContext);
@@ -18,12 +18,12 @@ const Dropdown = () => {
     <select
       onChange={onChangeHandler}
       name="setting"
-      className="m-4 w-32 rounded-lg bg-black py-3 text-center text-lg font-bold text-white shadow-md shadow-slate-500 "
+      className="w-32 py-3 m-4 text-lg font-bold text-center text-white bg-black rounded-lg shadow-sm shadow-slate-500 "
     >
       {optionList.map((option) => (
         <option
           defaultChecked
-          className="rounded-lg p-3"
+          className="p-3 rounded-lg"
           value={option}
           key={option}
         >
