@@ -9,7 +9,7 @@ const StartGame = () => {
 
   const playGame = () =>
     dispatch({
-      type: "UPDATE_GAME_SCREEN",
+      type: "CHANGE_GAME_SCREEN",
       payload: { screen: GAME_SCREEN.INGAME },
     });
 

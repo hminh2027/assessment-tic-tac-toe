@@ -1,19 +1,20 @@
 import { createContext, useReducer } from "react";
-import { GAME_SCREEN } from "../constants/constants";
+import { GAME_SCREEN, PLAYER } from "../constants/constants";
 
 const initState = {
   gameScreen: GAME_SCREEN.STARTGAME,
   boardSize: 3,
   winner: null,
   historyBoard: [],
-  curIndex: -1,
+  historyIndex: -1,
+  nextPlayer: PLAYER.PLAYER_1,
 };
 
 const AppContext = createContext();
 
 const appReducer = (state, action) => {
   switch (action.type) {
-    case "UPDATE_GAME_SCREEN":
+    case "CHANGE_GAME_SCREEN":
       return {
         ...state,
         gameScreen: action.payload.screen,
@@ -23,23 +24,43 @@ const appReducer = (state, action) => {
         ...state,
         boardSize: +action.payload.boardSize,
       };
-    case "PUSH_BOARD_HISTORY":
-      const cloned = structuredClone(state.historyBoard);
+    case "CHANGE_NEXT_PLAYER":
+      return {
+        ...state,
+        nextPlayer: action.payload.nextPlayer,
+      };
+    case "ADD_HISTORY":
+      const cloned = structuredClone(state.historyBoard).slice(
+        0,
+        state.historyIndex + 1
+      );
       cloned.push(action.payload.historyBoard);
       return {
         ...state,
         historyBoard: cloned,
-        curIndex: state.curIndex + 1,
+        historyIndex: state.historyIndex + 1,
       };
-    case "INCREASE_INDEX":
+    case "REDO":
+      if (state.historyIndex === state.historyBoard.length - 1) return state;
+
       return {
         ...state,
-        curIndex: state.curIndex + 1,
+        historyIndex: state.historyIndex + 1,
+        nextPlayer:
+          state.nextPlayer === PLAYER.PLAYER_1
+            ? PLAYER.PLAYER_2
+            : PLAYER.PLAYER_1,
       };
-    case "DECREASE_INDEX":
+    case "UNDO":
+      if (state.historyIndex === 0) return state;
+
       return {
         ...state,
-        curIndex: state.curIndex - 1,
+        historyIndex: state.historyIndex - 1,
+        nextPlayer:
+          state.nextPlayer === PLAYER.PLAYER_1
+            ? PLAYER.PLAYER_2
+            : PLAYER.PLAYER_1,
       };
     case "GAME_OVER":
       return {

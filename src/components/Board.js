@@ -3,41 +3,51 @@ import { PLAYER } from "../constants/constants";
 import { AppContext } from "../contexts/context";
 import Cell from "./Cell";
 
-const Board = ({ playerTurn, setPlayerTurn }) => {
+const Board = () => {
   const { state, dispatch } = useContext(AppContext);
   const [cells, setCells] = useState([]);
+  const [moveCount, setMoveCount] = useState(0);
+
+  useEffect(() => {
+    if (drawCheck()) dispatch({ type: "GAME_OVER", payload: { winner: null } });
+  }, [moveCount]);
 
   useEffect(() => {
     if (state.historyBoard.length === 0) return;
-    setCells(state.historyBoard[state.curIndex]);
-  }, [state.curIndex]);
+    setCells(state.historyBoard[state.historyIndex]);
+  }, [state.historyIndex]);
 
   const cellClickHandler = (row, col) => {
     // Check if cell is ticked
     if (cells[row][col]) return;
 
     // Clone new cells and update
-    const newCells = cells.slice();
-    newCells[row][col] = playerTurn;
+    const newCells = structuredClone(cells);
+    newCells[row][col] = state.nextPlayer;
 
     // Check winner
     const winner = victoryCheck(newCells, row, col);
     if (winner) dispatch({ type: "GAME_OVER", payload: { winner } });
 
-    // Check draw
-    if (drawCheck(newCells))
-      dispatch({ type: "GAME_OVER", payload: { winner: null } });
-
     // Add history
     dispatch({
-      type: "PUSH_BOARD_HISTORY",
+      type: "ADD_HISTORY",
       payload: { historyBoard: newCells },
     });
 
+    // Add move count
+    setMoveCount((c) => c + 1);
+
     // Set player turn
-    setPlayerTurn(
-      playerTurn === PLAYER.PLAYER_1 ? PLAYER.PLAYER_2 : PLAYER.PLAYER_1
-    );
+    dispatch({
+      type: "CHANGE_NEXT_PLAYER",
+      payload: {
+        nextPlayer:
+          state.nextPlayer === PLAYER.PLAYER_1
+            ? PLAYER.PLAYER_2
+            : PLAYER.PLAYER_1,
+      },
+    });
   };
 
   const victoryCheck = (cells, rowIdx, colIdx) => {
@@ -71,31 +81,23 @@ const Board = ({ playerTurn, setPlayerTurn }) => {
     return null;
   };
 
-  const drawCheck = (cells) => {
-    let isDraw = true;
-    cells.forEach((cell) => {
-      cell.forEach((c) => {
-        if (c === null) isDraw = false;
-      });
-    });
-
-    return isDraw;
-  };
+  const drawCheck = () => moveCount === state.boardSize * state.boardSize;
 
   return (
     <div>
       {cells.length > 0 &&
         cells.map((row, rowIdx) => (
           <div key={rowIdx} className="flex justify-center">
-            {row.map((col, colIdx) => (
-              <Cell
-                key={colIdx}
-                value={cells[rowIdx][colIdx]}
-                cellClickHandler={cellClickHandler}
-                col={colIdx}
-                row={rowIdx}
-              />
-            ))}
+            {row.length > 0 &&
+              row.map((col, colIdx) => (
+                <Cell
+                  key={colIdx}
+                  value={cells[rowIdx][colIdx]}
+                  cellClickHandler={cellClickHandler}
+                  col={colIdx}
+                  row={rowIdx}
+                />
+              ))}
           </div>
         ))}
     </div>

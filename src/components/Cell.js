@@ -1,27 +1,14 @@
-import React, { useState, useEffect } from "react";
-import XIcon from "../assets/x-icon.png";
-import YIcon from "../assets/y-icon.png";
-import { PLAYER } from "../constants/constants";
+import React from "react";
 
 const Cell = ({ value, cellClickHandler, col, row }) => {
-  const [displayIcon, setDisplayIcon] = useState(null);
-
-  useEffect(() => {
-    if (!value) return;
-    setDisplayIcon(value === PLAYER.PLAYER_1 ? XIcon : YIcon);
-  }, [value]);
-
   return (
     <div
       onClick={() => cellClickHandler(row, col)}
-      className="flex h-32 w-32  items-center border-2 border-black"
+      className="flex items-center w-32 h-32 border-2 border-black"
     >
-      <div
-        className="mx-auto h-24 w-24"
-        style={{
-          background: `url(${displayIcon}) no-repeat center center/cover`,
-        }}
-      ></div>
+      <div className="flex items-center justify-center w-24 h-24 mx-auto text-7xl">
+        {value}
+      </div>
     </div>
   );
 };
